@@ -1,0 +1,114 @@
+{
+  "outputs/stage118_delivery/guide/all-training/model.pt": {
+    "bytes": 1124603,
+    "sha256": "78fb96ea958e30e844168f4995ac85cebc6e41fa61a047f6a35ee3852f9e0078"
+  },
+  "outputs/stage118_delivery/refiner/all-training/model.pt": {
+    "bytes": 505221,
+    "sha256": "8baad9c8102182fda6eb73782439f1116643623abb2ee2d3f75acf2d29809de9"
+  },
+  "outputs/stage118_delivery/adapted/all-training/model.pt": {
+    "bytes": 343576623,
+    "sha256": "67f72300250569075cf4795fd74aed0453a55289c47ec7f62cac00913174943f"
+  },
+  "outputs/stage233_native_ex_delivery/model.pt": {
+    "bytes": 523013,
+    "sha256": "88b1faa08c795dba618260e1a9fb4d49f5626d5673ff6ef628ea6c05be7a3581"
+  },
+  "outputs/stage247_positive_iv_delivery/model.pt": {
+    "bytes": 576965,
+    "sha256": "7133cd8f82310df7ad282473d530ac0eb90d9695ef87f440b4c70da2a653d89a"
+  },
+  "outputs/stage100_lora_iv/all-training/adapter.pt": {
+    "bytes": 5553981,
+    "sha256": "4804f2d390b3b2dae5fa8801e29d30f88a3195ddb6df17e64ba0af3a7c4e6bca"
+  },
+  "outputs/stage187_delivery/quality.pt": {
+    "bytes": 8781,
+    "sha256": "1ca557a1a02b1f2fcc577670edb1e5d0ab82fb95f4eba5fd818ebc6890119aaa"
+  },
+  "outputs/stage645_unseen_joint_delivery/quality.pt": {
+    "bytes": 8973,
+    "sha256": "7c12dc76c0369e081bd607fdaeb4b6eff87d77eb281248450233298967cd3c29"
+  },
+  "models/cellpose4/cpdino": {
+    "bytes": 1213987717,
+    "sha256": "fad0dda262554922da1c5ab0e0004b00c1b14b8a48bea6781b89222567577573"
+  },
+  "models/cellpose4/cpdino-vitb": {
+    "bytes": 343599997,
+    "sha256": "3ed4c06a3963ab13ff377d4e2957174aaaf637434eb031ae9931fcbfaf9a217f"
+  },
+  "outputs/stage8_iv/5d/model.pt": {
+    "bytes": 1077893,
+    "sha256": "be791c950b8529bead1951f9ad26c5e283d212d5e031d6eaff0f6723df0df567"
+  },
+  "outputs/stage6_ex/unet_holdout_5d/model.pt": {
+    "bytes": 487365,
+    "sha256": "3165b6d50e25a9f200b971b3a5634dd56710c67d657382a9d7bb763744baf180"
+  },
+  "outputs/stage8_iv_quality_capacity/5d.pt": {
+    "bytes": 3645,
+    "sha256": "11e4567fc799223cec80c10c0e63e964ea679110fae0367643d37a5fa05b19ab"
+  },
+  "outputs/stage6_specialist_quality/5d/model.pt": {
+    "bytes": 3861,
+    "sha256": "b5619011b4754176182605e29f169f49607f9e1754427ba80e9fe39912eb15f3"
+  },
+  "outputs/stage13_native_relative/5d.pt": {
+    "bytes": 3773,
+    "sha256": "2c5ac1defa9a0b31fb1afea91008d4f545b11cc204281e95f2d10ea2bc31a499"
+  },
+  "outputs/stage8_joint_iv_quality/5d.pt": {
+    "bytes": 3709,
+    "sha256": "e2219111b8764e73539b2728c7423c5a4241d07fccbf3d9f15d2a5a4bcacafbe"
+  },
+  "outputs/stage8_iv/b2/model.pt": {
+    "bytes": 1077957,
+    "sha256": "1e13006dcb8fa3f5f2d2bfba22bc962b24b9b9c211be23a43716f147f04fc22e"
+  },
+  "outputs/stage6_ex/unet_holdout_b2/model.pt": {
+    "bytes": 487493,
+    "sha256": "e3b2ab71aa811142769d0837e97ee07ee9485968b092a1121f9689b3cf95cc8a"
+  },
+  "outputs/stage8_iv_quality_capacity/b2.pt": {
+    "bytes": 3709,
+    "sha256": "9c37a17977107550b2b5384fbcc1e48a92f116f45892c68af3da7386f348e0f9"
+  },
+  "outputs/stage6_specialist_quality/b2/model.pt": {
+    "bytes": 3989,
+    "sha256": "8f5902dc042890705790749bbfd0f4811c0a95b2834269bc99af19a028a558cb"
+  },
+  "outputs/stage13_native_relative/b2.pt": {
+    "bytes": 3837,
+    "sha256": "3eab00c584c2c4ebb95697479e08b703fbde8b2a558a59a5f02a2a00b3c125cd"
+  },
+  "outputs/stage8_joint_iv_quality/b2.pt": {
+    "bytes": 3837,
+    "sha256": "129424bd4ddf7389fe7b06f91ad42deb7688da78acc2626ef916a785b65c9415"
+  },
+  "outputs/stage8_iv/db/model.pt": {
+    "bytes": 1077765,
+    "sha256": "8f1a3a19e740c673ae913f893b478b02cc345c16c9d8315b6801393fba51c1b1"
+  },
+  "outputs/stage6_ex/unet_holdout_db/model.pt": {
+    "bytes": 487301,
+    "sha256": "94a362674b7675cdb5a888c481017b713a1d8d3776b5ce574f2d6a86245d9048"
+  },
+  "outputs/stage8_iv_quality_capacity/db.pt": {
+    "bytes": 3517,
+    "sha256": "2bc71ec456e5c4825948004176719d73b36fbb69df841f93e0364247f562f07b"
+  },
+  "outputs/stage6_specialist_quality/db/model.pt": {
+    "bytes": 3797,
+    "sha256": "c032483312b944a3f6ad65cf042c804b1d6e9d948ec1656650face2ad9d0226b"
+  },
+  "outputs/stage13_native_relative/db.pt": {
+    "bytes": 3645,
+    "sha256": "20a46bc1bcab606e7a3126c5acc8c9cedfca28af109c64fe7fd3db2432a25da9"
+  },
+  "outputs/stage8_joint_iv_quality/db.pt": {
+    "bytes": 3645,
+    "sha256": "d4d51eee69811255a6add34f25d1bbb04283e54cb48a6d5abb3bdd9a0cfab959"
+  }
+}

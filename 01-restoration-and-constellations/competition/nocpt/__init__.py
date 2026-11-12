@@ -1,0 +1,1 @@
+"""Reproducible constellation detection pipeline."""

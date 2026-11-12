@@ -1,0 +1,4 @@
+# Exact CPU inference / cached-feature training inspection.
+numpy>=1.26,<3
+torch>=2.6,<3
+catboost>=1.2.10,<1.3

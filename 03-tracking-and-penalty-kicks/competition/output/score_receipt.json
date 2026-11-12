@@ -1,0 +1,16 @@
+{
+  "ref": "57916108",
+  "file_name": "submission_R151_R142plusR150.csv",
+  "description": "R151 fixed75R142+25R150SAMfull36raw;keeperR142;900rows;sha5e8feee4270b",
+  "date": "2026-11-02 17:13:58.283000",
+  "status": "SubmissionStatus.COMPLETE",
+  "public_score": "0.81777",
+  "submission_sha256": "5e8feee4270b92f0be337cf395e8a8b5dd691a87261ad1266e098ef2b2367449",
+  "checked_utc": "2026-11-02T17:15:01.523218+00:00",
+  "maximum_authorized_uploads": 1,
+  "R142_public_score": 0.79444,
+  "weighted_public_score_change": 0.023329999999999962,
+  "inferred_kick_accuracy_change_pp": 3.3328571428571374,
+  "absolute_kick_accuracy": null,
+  "interpretation": "Same900keeper labels;score difference/.7 approximates publickickaccuracy change,subjectscore rounding. It does not reveal absolute kickaccuracy."
+}

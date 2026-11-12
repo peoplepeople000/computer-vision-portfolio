@@ -1,0 +1,8 @@
+{
+  "workers": 4,
+  "search_mode": "deep",
+  "highpass_always": false,
+  "probability_threshold": null,
+  "prevalence_strength": 0.0,
+  "min_present_fraction": 0.55
+}

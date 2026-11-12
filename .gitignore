@@ -1,0 +1,13 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+**/notebooks/data/
+**/notebooks/output/
+**/notebooks/results/
+**/competition/participant/
+**/competition/outputs/cache/
+**/competition/output/reproduced/
+02-geometry-and-cell-matching/competition/weights/*
+!02-geometry-and-cell-matching/competition/weights/manifest.json

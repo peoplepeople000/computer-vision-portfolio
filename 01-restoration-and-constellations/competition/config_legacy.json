@@ -1,0 +1,8 @@
+{
+  "workers": 4,
+  "search_mode": "legacy",
+  "highpass_always": false,
+  "probability_threshold": 0.20,
+  "prevalence_strength": 0.0,
+  "min_present_fraction": 0.0
+}

@@ -1,0 +1,68 @@
+"""Public Cellpose inference at a diameter estimated only from other mice.
+
+No evaluation-mouse labels choose the scale. The fixed statistic is the median
+area-equivalent diameter of annotated training cells for the requested modality.
+"""
+import argparse,copy,hashlib,json,time
+from pathlib import Path
+from importlib.metadata import version
+import numpy as np
+import torch
+from .data import read_rows,write_rows,split_id,read_image,image_path
+from .stage3 import FOLDS
+from .rle import labels_to_instances
+from .cellpose_baseline import confidence_maps
+
+
+def estimate_diameter(rows,ids,modality):
+    areas=[sum(map(int,rle.split()[1::2])) for sid in ids for rle in rows[sid][modality+'_instances'].values()]
+    if not areas or min(areas)<=0:raise ValueError('Empty training cell areas')
+    return float(np.median(2*np.sqrt(np.array(areas)/np.pi)))
+
+
+def main():
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--model',choices=['cpdino-vitb','cpsam_v2'],required=True)
+    p.add_argument('--output',type=Path,required=True);p.add_argument('--modality',choices=['invivo','exvivo','both'],default='invivo');p.add_argument('--limit-per-subject',type=int,default=1);p.add_argument('--device',choices=['cpu','mps'],default='mps');a=p.parse_args()
+    from cellpose import models
+    if version('cellpose')!='4.2.1':raise ValueError('Use pinned isolated Cellpose 4 runtime')
+    torch.set_num_threads(2);torch.manual_seed(2068);device=torch.device(a.device)
+    if a.device=='mps' and not torch.backends.mps.is_available():raise RuntimeError('MPS unavailable')
+    root=Path('data/raw/Project_2_Dataset');truth=read_rows(root/'training/train_ground_truth.csv')
+    ref_path=Path('outputs/stage13_native_relative/preserved/predicted_all.csv');reference=read_rows(ref_path)
+    if set(reference)!=set(truth):raise ValueError('Wrong prediction reference')
+    modalities=['invivo','exvivo'] if a.modality=='both' else [a.modality]
+    diameter={};selected=[]
+    for tag,subject in FOLDS.items():
+        ids=sorted(s for s in truth if split_id(s)[0]!=subject)
+        diameter[subject]={'train_ids':ids,'diameters':{m:estimate_diameter(truth,ids,m) for m in modalities}}
+        test=sorted(s for s in reference if split_id(s)[0]==subject)
+        selected.extend(test[:a.limit_per_subject] if a.limit_per_subject else test)
+    checkpoint=Path('models/cellpose4')/a.model;digest=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+    known=next(r for r in json.loads(Path('models/cellpose4/provenance.json').read_text()) if r['model']==a.model)
+    if digest(checkpoint)!=known['sha256']:raise ValueError('Public checkpoint changed')
+    config={**{k:str(v) if isinstance(v,Path) else v for k,v in vars(a).items()},'source_sha256':digest(__file__),'reference_sha256':digest(ref_path),
+        'checkpoint_sha256':digest(checkpoint),'cellpose_version':version('cellpose'),'torch_version':torch.__version__,'scales':diameter,
+        'policy':'Median area-equivalent cell diameter from only the two other mice. Fixed official pretrained weights, default normalization, flow 0.4, cell probability 0, minimum 15 original pixels, float32 batch one.',
+        'batch_size':1,'use_bfloat16':False,'fine_tuning':False}
+    out=a.output;out.mkdir(parents=True,exist_ok=True);config_path=out/'configuration.json'
+    if config_path.exists() and json.loads(config_path.read_text())!=config:raise ValueError('Output configuration changed')
+    config_path.write_text(json.dumps(config,indent=2)+'\n')
+    for name in ['regions','maps','flows']:(out/name).mkdir(exist_ok=True)
+    model=models.CellposeModel(pretrained_model=str(checkpoint),device=device,use_bfloat16=False);rows=[]
+    for sid in selected:
+        saved=out/'regions'/f'{sid}.json'
+        if saved.exists():rows.append(json.loads(saved.read_text()));continue
+        row=copy.deepcopy(reference[sid]);row['match_pairs']=[]
+        for modality in modalities:
+            started=time.perf_counter();image=read_image(image_path(root,'training',sid,modality));diam=diameter[split_id(sid)[0]]['diameters'][modality]
+            labels,flows,_=model.eval(image,batch_size=1,diameter=diam,min_size=15,flow_threshold=.4,cellprob_threshold=0.,normalize=True)
+            if labels.shape!=image.shape or np.asarray(flows[2]).shape!=image.shape:raise ValueError('Wrong full-resolution output')
+            row[modality+'_instances']=labels_to_instances(labels.astype(np.int32),'CP4S')
+            np.savez_compressed(out/'maps'/f'{sid}_{modality}.npz',maps=confidence_maps(labels,np.asarray(flows[2])).astype(np.float16))
+            np.savez_compressed(out/'flows'/f'{sid}_{modality}.npz',dP=np.asarray(flows[1],dtype=np.float32),cellprob=np.asarray(flows[2],dtype=np.float32),labels=labels.astype(np.int32))
+            print('Scaled Cellpose',a.model,sid,modality,'diameter',diam,'cells',len(row[modality+'_instances']),'seconds',round(time.perf_counter()-started,2),flush=True)
+            if a.device=='mps':torch.mps.empty_cache()
+        saved.write_text(json.dumps(row)+'\n');rows.append(row)
+    write_rows(rows,out/'predictions.csv');(out/'completion.json').write_text(json.dumps({'regions':len(rows),'sample_ids':selected,'full_coverage':set(selected)==set(reference),'csv_sha256':digest(out/'predictions.csv')},indent=2)+'\n')
+
+if __name__=='__main__':main()

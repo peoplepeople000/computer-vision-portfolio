@@ -1,0 +1,24 @@
+# Keep the GPU host's matching CUDA torch / torchvision builds.
+-r requirements.txt
+torchvision>=0.21,<1
+Pillow>=10,<14
+pandas>=2,<4
+scipy>=1.11,<2
+scikit-learn>=1.4,<2
+xgboost>=2,<4
+opencv-contrib-python-headless==4.11.0.86
+onnxruntime-gpu==1.23.2
+transformers==4.57.1
+# Install rtmlib separately with --no-deps to avoid its CPU ONNX Runtime dependency.
+huggingface_hub>=0.34,<1
+roma
+yacs
+omegaconf
+antlr4-python3-runtime==4.9.3
+braceexpand
+pytorch-lightning
+lightning-utilities
+torchmetrics
+einops
+timm
+PyYAML

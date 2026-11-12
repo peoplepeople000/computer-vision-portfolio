@@ -1,0 +1,94 @@
+{
+  "native": {
+    "invivo": {
+      "foreground": 0.5,
+      "seed": 0.35,
+      "quality": 0.45
+    },
+    "exvivo": {
+      "foreground": 0.7,
+      "seed": 0.35,
+      "quality": 0.25
+    },
+    "pairs": {
+      "threshold": 0.25,
+      "radius": 6.0
+    }
+  },
+  "prior": {
+    "stretch": [
+      [
+        0.9848635057304864,
+        -0.026161710205597887
+      ],
+      [
+        -0.026161710205597856,
+        0.9250883594526238
+      ]
+    ],
+    "angle_low": -31.44658514703213,
+    "angle_high": 27.89766109961377,
+    "train_ids": [
+      "subject_5d294c__region_17e229",
+      "subject_5d294c__region_209578",
+      "subject_5d294c__region_2b8b0c",
+      "subject_5d294c__region_39ea34",
+      "subject_5d294c__region_3c6653",
+      "subject_5d294c__region_4ae6be",
+      "subject_5d294c__region_69ca88",
+      "subject_5d294c__region_713e9f",
+      "subject_5d294c__region_737a43",
+      "subject_5d294c__region_8fa5c0",
+      "subject_5d294c__region_921beb",
+      "subject_5d294c__region_952df0",
+      "subject_5d294c__region_a5b200",
+      "subject_5d294c__region_dbe233",
+      "subject_5d294c__region_dd753e",
+      "subject_b2ba5e__region_0849d7",
+      "subject_b2ba5e__region_0ef270",
+      "subject_b2ba5e__region_17383a",
+      "subject_b2ba5e__region_265c9a",
+      "subject_b2ba5e__region_384c40",
+      "subject_b2ba5e__region_39692d",
+      "subject_b2ba5e__region_66750c",
+      "subject_b2ba5e__region_67c96c",
+      "subject_b2ba5e__region_7edc76",
+      "subject_b2ba5e__region_883423",
+      "subject_b2ba5e__region_bba213",
+      "subject_b2ba5e__region_e98bb8",
+      "subject_db6b8b__region_067f7e",
+      "subject_db6b8b__region_148132",
+      "subject_db6b8b__region_1b72a7",
+      "subject_db6b8b__region_261dc0",
+      "subject_db6b8b__region_2e6e9e",
+      "subject_db6b8b__region_3335ca",
+      "subject_db6b8b__region_65121e",
+      "subject_db6b8b__region_6b73b7",
+      "subject_db6b8b__region_84ffae",
+      "subject_db6b8b__region_8ce6d1",
+      "subject_db6b8b__region_933421",
+      "subject_db6b8b__region_9b09ea",
+      "subject_db6b8b__region_a8fcd9",
+      "subject_db6b8b__region_ac03bd",
+      "subject_db6b8b__region_b7618f",
+      "subject_db6b8b__region_ce8b99",
+      "subject_db6b8b__region_f6d150",
+      "subject_db6b8b__region_fe3e4d"
+    ],
+    "held_out": null,
+    "purpose": "Training-derived prior; no per-test-region fitted labels"
+  },
+  "relative": {
+    "foreground": 0.7,
+    "quality": 0.35,
+    "pairs": {
+      "threshold": 0.25,
+      "radius": 6.0
+    }
+  },
+  "ex_fold_foreground": {
+    "subject_5d294c": 0.6,
+    "subject_b2ba5e": 0.7,
+    "subject_db6b8b": 0.7
+  }
+}

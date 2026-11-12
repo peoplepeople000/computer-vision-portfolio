@@ -1,0 +1,6 @@
+{
+  "probability_threshold": 0.6,
+  "cross_validation_score_with_oracle_names": 0.8265909366251659,
+  "training_present_fraction": 0.6120689655172413,
+  "cross_validation_prevalence_score_with_oracle_names": 0.7983971913367865
+}

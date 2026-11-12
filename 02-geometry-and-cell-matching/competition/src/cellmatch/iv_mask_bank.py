@@ -1,0 +1,152 @@
+"""Learn a per-cell choice between two IV mask families, with unique assignments.
+
+Both IV segmenters and pair calibration exclude the outer mouse. A fixed IoU
+association groups alternative contours of the same cell. Each family can be
+used once; a pair chooses its highest predicted-credit contour. Unpaired IV
+segmentation comes from the stable baseline. No per-subject winner selection.
+"""
+import argparse,copy,hashlib,json
+from pathlib import Path
+from types import SimpleNamespace
+import numpy as np,torch
+from scipy.optimize import linear_sum_assignment
+from .data import read_rows,write_rows,parse_instances,split_id
+from .stage3 import FOLDS,quality_probabilities
+from .ex_joint_calibration import morphology_features
+from .relative_ex_quality import relative_features
+from .pair_quality import training_record
+from .joint_pair_assignment import candidate_features,fit,probability,assign_edges
+from .cellpose_contour_consensus import blend
+from .cellpose4_quality import preserve_iv_pairs
+from .metrics import segmentation_score
+from .cli import evaluate
+
+
+def family_features(banks):
+    keys=[list(m) for m in banks];families={};extra={}
+    for b,ks in enumerate(keys):
+        for k in ks:families[f'{b}:{k}']=f'{b}:{k}';extra[f'{b}:{k}']=np.array([b,0.,0.,8.],np.float32)
+    overlaps=np.array([[banks[0][i].iou(banks[1][j]) for j in keys[1]] for i in keys[0]]).reshape(len(keys[0]),len(keys[1]))
+    ii,jj=linear_sum_assignment(overlaps,maximize=True)
+    for i,j in zip(ii,jj):
+        if overlaps[i,j]<=.25:continue
+        a,b=keys[0][i],keys[1][j];ma,mb=banks[0][a],banks[1][b]
+        distance=min(float(np.linalg.norm(ma.coordinates().mean(0)-mb.coordinates().mean(0))),8.)
+        families[f'1:{b}']=families[f'0:{a}']
+        extra[f'0:{a}']=np.array([0,overlaps[i,j],np.log(mb.area/ma.area),distance],np.float32)
+        extra[f'1:{b}']=np.array([1,overlaps[i,j],np.log(ma.area/mb.area),distance],np.float32)
+    return families,extra
+
+
+def bank_record(rows,maps,exmaps,matrix,actual=None,verified=None):
+    banks=[parse_instances(row,'invivo',v.shape[1:]) for row,v in zip(rows,maps)]
+    ex=parse_instances(rows[0],'exvivo',exmaps.shape[1:]);ef=morphology_features(ex,exmaps)[1]
+    families,extra=family_features(banks);pairs=[];xs=[];ys=[];all_masks={}
+    exmap=segmentation_score(ex,actual[1])['pred_to_gt'] if actual is not None else None
+    for b,(masks,v) in enumerate(zip(banks,maps)):
+        edges,x=candidate_features([masks,ex],[morphology_features(masks,v)[1],ef],matrix)
+        prefixed={f'{b}:{k}':m for k,m in masks.items()};all_masks.update(prefixed)
+        pairs.extend([[f'{b}:{i}',j] for i,j in edges])
+        xs.append(np.c_[x,np.array([extra[f'{b}:{i}'] for i,j in edges]).reshape(-1,4)].astype(np.float32))
+        if actual is not None:
+            mapping=segmentation_score(masks,actual[0])['pred_to_gt']
+            ys.extend((mapping.get(i),exmap.get(j)) in verified for i,j in edges)
+    return dict(pairs=pairs,x=np.concatenate(xs),y=np.asarray(ys,bool),families=families,masks=all_masks)
+
+
+def choose(record,p,threshold,radius):
+    best={}
+    for n,(iv,ex) in enumerate(record['pairs']):
+        if p[n]<=threshold or record['x'][n,18]>=radius:continue
+        key=(record['families'][iv],ex)
+        if key not in best or p[n]>p[best[key]]:best[key]=n
+    keys=list(best)
+    edges=assign_edges(keys,np.array([p[best[k]] for k in keys]),threshold,
+        np.array([record['x'][best[k],18] for k in keys]),radius)
+    indices=[best[tuple(edge)] for edge in edges]
+    # Family association is approximate. Enforce actual pixel disjointness too.
+    accepted=[];occupied=set()
+    for n in sorted(indices,key=lambda n:(-float(p[n]),n)):
+        mask=record['masks'][record['pairs'][n][0]]
+        pixels=set()
+        for start,end in zip(mask.starts,mask.ends):pixels.update(range(int(start),int(end)))
+        if pixels&occupied:continue
+        occupied.update(pixels);accepted.append(n)
+    return accepted
+
+
+def main():
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--fold',choices=list(FOLDS),required=True)
+    p.add_argument('--output',type=Path,default=Path('outputs/stage43_iv_mask_bank'));a=p.parse_args();torch.set_num_threads(1)
+    root=Path('data/raw/Project_2_Dataset');truth=read_rows(root/'training/train_ground_truth.csv');subject=FOLDS[a.fold]
+    ids=sorted(s for s in truth if split_id(s)[0]!=subject)
+    newroot=Path('outputs/stage35_cpdino_iv_adapted')/a.fold
+    oldroot=Path('outputs/stage8_iv')/a.fold
+    exroot=Path('outputs/stage11_native_ex')/a.fold
+    files=[newroot/'configuration.json',newroot/'model.pt',oldroot/'training_config.json',oldroot/'model.pt',oldroot/'development.csv',exroot/'training_config.json']
+    for path in [newroot/'configuration.json',oldroot/'training_config.json',exroot/'training_config.json']:
+        cfg=json.loads(path.read_text())
+        if cfg['held_out']!=subject or sorted(cfg['train_ids'])!=ids:raise ValueError('Invalid fold')
+    publicpath=Path('outputs/stage28_cpdino_iv_full/predictions.csv');public=read_rows(publicpath);files.append(publicpath)
+    baselinepath=Path('outputs/stage32_contour_consensus/predicted_all.csv');baseline=read_rows(baselinepath);files.append(baselinepath)
+    def quality(path):
+        state=torch.load(path,map_location='cpu',weights_only=False)
+        if state['held_out']!=subject or sorted(state['train_ids'])!=ids:raise ValueError('Invalid quality fold')
+        model=torch.nn.Linear(30,1);model.load_state_dict(state['quality']);files.append(path)
+        return model.eval(),state['mean'],state['sd'],state['threshold']
+    iq=quality(Path(f'outputs/stage8_iv_quality_capacity/{a.fold}.pt'))
+    eq=quality(Path(f'outputs/stage13_native_relative/{a.fold}.pt'))
+    cp=Path('outputs/stage13_native_relative/calibration.json');cal=json.loads(cp.read_text())[subject];files.append(cp)
+    if sorted(cal['train_ids'])!=ids:raise ValueError('Invalid foreground fold')
+    development=read_rows(oldroot/'development.csv')
+    if set(development)!=set(ids):raise ValueError('Invalid development coverage')
+    records=[]
+    for sid in ids:
+        paths=[oldroot/'maps'/f'{sid}_invivo.npz',newroot/'maps'/f'{sid}_invivo.npz',exroot/'maps'/f'{sid}_exvivo.npz',newroot/'regions'/f'{sid}.json'];files.extend(paths)
+        om,nm,em=[np.load(path)['maps'].astype(np.float32) for path in paths[:3]]
+        old=copy.deepcopy(development[sid]);masks=parse_instances(old,'invivo',om.shape[1:]);keys,xf=morphology_features(masks,om)
+        keep={k for k,q in zip(keys,quality_probabilities(iq[:3],xf)) if q>=iq[3]}
+        old['invivo_instances']={k:v for k,v in old['invivo_instances'].items() if k in keep};old['match_pairs']=[]
+        old,_=blend(old,public[sid],om.shape[1:])
+        result=training_record(root,sid,truth[sid],old,em,cal['foreground'],eq,quality_transform=relative_features)
+        if result is None:continue
+        old,_,actual,matrix=result
+        new=copy.deepcopy(old);new['invivo_instances']=json.loads(paths[3].read_text())['invivo_instances']
+        r=bank_record([old,new],[om,nm],em,matrix,actual,set(map(tuple,truth[sid]['match_pairs'])))
+        r.update(sample_id=sid,subject=split_id(sid)[0]);records.append(r)
+        print('IV bank development',a.fold,sid,len(r['pairs']),int(r['y'].sum()),flush=True)
+    inner=[]
+    for mouse in sorted({r['subject'] for r in records}):
+        fitted=fit([r for r in records if r['subject']!=mouse])
+        inner.extend((r,probability(fitted,r['x'])) for r in records if r['subject']==mouse)
+    measurements=[];total=sum(len(truth[s]['match_pairs']) for s in ids)
+    for radius in (4.,5.,6.,8.):
+        for threshold in (.05,.1,.15,.2,.25,.3,.35,.4,.45,.5):
+            correct=count=0
+            for r,prob in inner:
+                chosen=choose(r,prob,threshold,radius);correct+=int(r['y'][chosen].sum());count+=len(chosen)
+            measurements.append(dict(radius=radius,threshold=threshold,f1=2*correct/(count+total)))
+    selected=max(measurements,key=lambda x:x['f1']);fitted=fit(records)
+    out=a.output/a.fold;out.mkdir(parents=True,exist_ok=True)
+    if (out/'model.pt').exists():raise FileExistsError('Preserve previous model')
+    torch.save(dict(state_dict=fitted[0].state_dict(),mean=fitted[1],sd=fitted[2],train_ids=ids,held_out=subject,selected=selected),out/'model.pt')
+    geometry=Path('outputs/stage9_subject_geometry/predicted_all_manifest.json');files.append(geometry)
+    matrices={r['sample_id']:np.asarray(r['matrix']) for r in json.loads(geometry.read_text())['regions'] if r.get('matrix') and r.get('status')=='registered'}
+    rows=[];choices=[0,0]
+    for sid in sorted(set(truth)-set(ids)):
+        paths=[oldroot/'maps'/f'{sid}_invivo.npz',newroot/'maps'/f'{sid}_invivo.npz',Path(f'outputs/stage7_tiles/maps/{sid}_exvivo.npz'),newroot/'regions'/f'{sid}.json'];files.extend(paths)
+        om,nm,em=[np.load(path)['maps'].astype(np.float32) for path in paths[:3]]
+        old=copy.deepcopy(baseline[sid]);new=copy.deepcopy(old);new['invivo_instances']=json.loads(paths[3].read_text())['invivo_instances']
+        r=bank_record([old,new],[om,nm],em,matrices.get(sid));prob=probability(fitted,r['x'])
+        chosen=choose(r,prob,selected['threshold'],selected['radius'])
+        paired=copy.deepcopy(old);paired['invivo_instances']={f'{b}:{k}':v for b,row in enumerate([old,new]) for k,v in row['invivo_instances'].items()}
+        paired['match_pairs']=[r['pairs'][n] for n in chosen]
+        for iv,_ in paired['match_pairs']:choices[int(iv[0])]+=1
+        rows.append(preserve_iv_pairs(paired,old))
+    path=out/'predictions.csv';write_rows(rows,path)
+    sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+    (out/'manifest.json').write_text(json.dumps(dict(held_out=subject,train_ids=ids,selected=selected,calibration=measurements,choices=choices,input_sha256={str(p):sha(p) for p in files},source_sha256=sha(__file__),limitation='Development segmentation is in-sample; outer mouse excluded. Repeated exploratory validation.'),indent=2)+'\n')
+    evaluate(SimpleNamespace(data=root,predictions=path,subject=subject,output=out/'metrics.json'))
+
+
+if __name__=='__main__':main()

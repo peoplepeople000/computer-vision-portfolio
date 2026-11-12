@@ -1,0 +1,17 @@
+scene,predicted_constellation,primary_constellation,primary_name_rank,primary_top_pattern_score,primary_top_margin,guided_score,guided_margin,guided_support,guided_switched,present_patches,total_patches,present_fraction,backfilled_patches,geometry_changes,naming_fallback,reranking_after_backfill
+constellation_01,ophiuchus,ophiuchus,1,7.1208,1.77,2.393565435136232,1.3602911790665675,6,False,16,23,0.6957,0,0,False,False
+constellation_02,corona-australis,corona-australis,1,12.8597,4.4991,1.7727915382432593,0.9808376373894513,6,False,16,24,0.6667,0,0,False,False
+constellation_03,musca,musca,2,9.9932,0.4999,0.8657731583070234,0.11677270402189821,4,False,18,31,0.5806,0,0,False,False
+constellation_04,canis-major,canis-major,1,25.7038,14.4522,4.982114897599405,3.342245937803056,11,False,30,54,0.5556,0,0,False,False
+constellation_05,carina,carina,1,10.788,2.5767,5.572677084044873,0.490833172836485,10,False,48,87,0.5517,3,0,False,False
+constellation_06,centaurus,corona-australis,1,6.9873,0.1975,6.4138277622212,5.341843014001431,13,True,34,61,0.5574,2,0,False,False
+constellation_07,perseus,perseus,1,19.0048,10.5363,2.472394165246012,1.7395444116224943,7,False,16,24,0.6667,0,0,False,False
+constellation_08,orion,orion,1,19.2038,9.1364,2.446772934206012,1.7222702800758136,9,False,23,37,0.6216,0,0,False,False
+constellation_10,centaurus,centaurus,1,32.397,19.3829,8.234600419926384,4.898368272885136,15,False,33,60,0.55,5,1,False,False
+constellation_11,canis-major,canis-major,1,21.2474,11.7441,4.210481289132461,2.9451740281854506,12,False,38,52,0.7308,0,0,False,False
+constellation_12,lupus,lupus,1,21.5882,11.7993,4.755917584457558,3.4309425162145764,11,False,20,28,0.7143,0,0,False,False
+constellation_13,aquila,aquila,1,12.3867,2.8049,2.3864548833533785,1.2656080772193556,8,False,22,32,0.6875,0,0,False,False
+constellation_14,aries,aries,1,8.6577,1.3317,1.5967447338349536,0.33949572464470923,5,False,27,36,0.75,0,0,False,False
+constellation_15,sagittarius,carina,1,8.4811,0.0481,7.306129657950944,4.903051134801242,16,True,48,69,0.6957,0,0,False,False
+constellation_16,taurus,taurus,1,7.222,1.3062,1.5287000961839783,0.2222759827693812,8,False,14,21,0.6667,0,0,False,False
+constellation_17,ursa-minor,hydrus,2,12.3837,3.5639,3.179658017009568,1.963138815505297,6,True,18,29,0.6207,0,0,False,False
