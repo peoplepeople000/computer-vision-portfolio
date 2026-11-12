@@ -2,7 +2,7 @@
 
 **My contribution.** I implemented the notebook and the Kaggle solution selected for our team's submission. Ta-Chun Tai and I submitted the project together.
 
-## Recovering structure from degraded images
+## IPython notebook · Q1–Q4 · Recovering structure from degraded images
 
 The notebook compares histogram-matching rules for color recovery, aligns and intensity-calibrates five observations of a galaxy, implements smoothing, Sobel gradients and edge selection in NumPy, and searches a panorama for templates across its horizontal seam. In the galaxy reconstruction, a pixel receives more weight when its calibrated observations agree. Shared blur or bias can survive that test. Without a clean reference image, the visual comparison is more informative than an estimated PSNR.
 
@@ -10,7 +10,7 @@ The notebook compares histogram-matching rules for color recovery, aligns and in
 
 [Open the notebook](notebooks/vision.ipynb) · [View the full reconstruction](assets/restoration.jpg)
 
-## Finding a constellation in a cluttered sky
+## Kaggle · Q5 · Finding a constellation in a cluttered sky
 
 The pipeline searches over rotation and scale with normalized cross-correlation, combines the peaks with polar-search candidates, then uses a learned verifier and geometric agreement with star patterns to select locations and infer the constellation name. The final CSV describes 16 scenes. Three labeled training scenes limit the evidence for generalization.
 

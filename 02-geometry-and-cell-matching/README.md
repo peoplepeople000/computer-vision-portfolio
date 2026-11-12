@@ -2,7 +2,15 @@
 
 **My contribution.** I implemented the submitted Kaggle pipeline. Our team selected Ta-Chun Tai's notebook. My notebook experiments also used SIFT matching and a RANSAC homography for cover replacement. For click-guided segmentation I explored SAM, while the submitted notebook uses GrabCut.
 
-## Matching cells between two microscopy views
+## IPython notebook · Q1–Q4 · Geometry notebook
+
+The team notebook detects runway boundaries, replaces a book cover with a homography, stitches six views into a panorama, and segments foreground objects from user clicks. Run it from `notebooks/` with the course folders `data/Q1` through `data/Q4` and OpenCV, NumPy, matplotlib and IPython installed.
+
+![Six-view cylindrical panorama](assets/panorama.jpg)
+
+[Open the notebook](notebooks/vision.ipynb)
+
+## Kaggle · Q5 · Matching cells between two microscopy views
 
 In vivo and ex vivo microscopy capture the same tissue under different imaging conditions. A correct correspondence requires locating the cell in each view, segmenting both endpoints and pairing their instance IDs. Bright fibers in the ex vivo view can resemble cell boundaries.
 
@@ -13,14 +21,6 @@ The pipeline estimates native masks with modality-specific networks, reconciles 
 Green shows annotated boundaries and red shows held-mouse predictions for one development region. This diagnostic uses Stage652, the validation counterpart of the submitted Stage653 configuration.
 
 **Team public score · 0.42847.** The metric weights in vivo panoptic quality (25%), ex vivo panoptic quality (25%) and pair F1 (50%). The submitted configuration produced 8,360 in vivo instances, 2,796 ex vivo instances and 386 pairs across 29 regions. These are prediction counts.
-
-## Geometry notebook
-
-The team notebook detects runway boundaries, replaces a book cover with a homography, stitches six views into a panorama, and segments foreground objects from user clicks. Run it from `notebooks/` with the course folders `data/Q1` through `data/Q4` and OpenCV, NumPy, matplotlib and IPython installed.
-
-![Six-view cylindrical panorama](assets/panorama.jpg)
-
-[Open the notebook](notebooks/vision.ipynb)
 
 ## Run the frozen model
 

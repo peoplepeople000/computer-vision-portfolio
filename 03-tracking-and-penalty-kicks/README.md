@@ -2,7 +2,7 @@
 
 **My contribution.** I implemented the submitted notebook. My competition experiments explored body pose, goalkeeper tracking and temporal SAM 3D Body features. Ta-Chun Tai implemented the competition version our team submitted. The kick-direction ensemble below describes that final team version.
 
-## Interpreting a CNN and measuring motion
+## IPython notebook · Q1–Q3 · Interpreting a CNN and measuring motion
 
 The notebook compares intermediate ResNet50 and DenseNet121 features and uses Grad-CAM to locate evidence for the predicted class. For the highway sequence, instance masks restrict optical flow to vehicle pixels. Across 1,501 frames at 25 FPS, the tracker produced 44 IDs and 8,268 vehicle observations. Median apparent speed was 90.76 pixels/s. Converting this to road speed would require camera calibration.
 
@@ -14,7 +14,7 @@ The person-and-dog tracker distinguishes detections from predicted positions dur
 
 To rerun the notebook, start in `notebooks/` with the four supplied files in `data/`: `Royal-Bengal-Tiger.jpg`, `face.png`, `highway.mp4` and `video.mp4`. Use a Colab GPU runtime or equivalent PyTorch environment with access to the pretrained models. The notebook checks input sizes and writes figures, video and per-frame measurements to `output/`.
 
-## Predicting the shot and the goalkeeper's response
+## Kaggle · Q4 · Predicting the shot and the goalkeeper's response
 
 The team predicts two directions from observations before ball contact. The kick branch combines pose geometry, an RGB crop of the kicker and a short sequence of SAM body tokens. The goalkeeper branch uses recent pose and motion, with a separate fallback for weak tracks.
 
