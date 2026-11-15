@@ -2,6 +2,8 @@
 
 **My contribution.** I implemented the notebook and the Kaggle solution selected for our team's submission. Ta-Chun Tai and I submitted the project together.
 
+[Experiments, comparisons and technical decisions](EXPERIMENTS.md)
+
 ## IPython notebook · Q1–Q4 · Recovering structure from degraded images
 
 The notebook compares histogram-matching rules for color recovery, aligns and intensity-calibrates five observations of a galaxy, implements smoothing, Sobel gradients and edge selection in NumPy, and searches a panorama for templates across its horizontal seam. In the galaxy reconstruction, a pixel receives more weight when its calibrated observations agree. Shared blur or bias can survive that test. Without a clean reference image, the visual comparison is more informative than an estimated PSNR.

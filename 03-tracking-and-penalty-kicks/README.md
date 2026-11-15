@@ -2,6 +2,8 @@
 
 **My contribution.** I implemented the submitted notebook. My competition experiments explored body pose, goalkeeper tracking and temporal SAM 3D Body features. Ta-Chun Tai implemented the competition version our team submitted. The kick-direction ensemble below describes that final team version.
 
+[Experiments, comparisons and technical decisions](EXPERIMENTS.md)
+
 ## IPython notebook · Q1–Q3 · Interpreting a CNN and measuring motion
 
 The notebook compares intermediate ResNet50 and DenseNet121 features and uses Grad-CAM to locate evidence for the predicted class. For the highway sequence, instance masks restrict optical flow to vehicle pixels. Across 1,501 frames at 25 FPS, the tracker produced 44 IDs and 8,268 vehicle observations. Median apparent speed was 90.76 pixels/s. Converting this to road speed would require camera calibration.

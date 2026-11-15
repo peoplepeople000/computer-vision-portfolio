@@ -2,6 +2,8 @@
 
 **My contribution.** I implemented the submitted Kaggle pipeline. Our team selected Ta-Chun Tai's notebook. My notebook experiments also used SIFT matching and a RANSAC homography for cover replacement. For click-guided segmentation I explored SAM, while the submitted notebook uses GrabCut.
 
+[Experiments, comparisons and technical decisions](EXPERIMENTS.md)
+
 ## IPython notebook · Q1–Q4 · Geometry notebook
 
 The team notebook detects runway boundaries, replaces a book cover with a homography, stitches six views into a panorama, and segments foreground objects from user clicks. Run it from `notebooks/` with the course folders `data/Q1` through `data/Q4` and OpenCV, NumPy, matplotlib and IPython installed.
